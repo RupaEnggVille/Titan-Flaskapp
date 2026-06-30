@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: titan-app
+  namespace: titan
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: titan-app
+  template:
+    metadata:
+      labels:
+        app: titan-app
+    spec:
+      containers:
+      - name: titan-app
+        image: hyma2025/titan-app:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: titan-service
+  namespace: titan
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "5000"
+spec:
+  selector:
+    app: titan-app
+  ports:
+  - port: 80
+    targetPort: 5000
+  type: LoadBalancer
